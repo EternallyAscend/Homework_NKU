@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/1.jpg</file>
+        <file>res/bg.jpg</file>
+        <file>res/bgc.jpg</file>
+        <file>res/weapon.png</file>
+        <file>res/bgc.png</file>
+        <file>res/BossBg.png</file>
+        <file>res/1.png</file>
+        <file>res/weapon50.png</file>
+        <file>res/2.png</file>
+        <file>res/Gameover.png</file>
+        <file>res/bgp.jpg</file>
+        <file>res/bullet(5,5).png</file>
+        <file>res/gunner(30.30).png</file>
+        <file>res/machinegunner(50,50).png</file>
+        <file>res/player(20,20).png</file>
+        <file>res/playerweapon(5,5).png</file>
+        <file>res/scatter(30,30).png</file>
+        <file>res/shotgun(20,20).png</file>
+        <file>res/Rule.png</file>
+        <file>res/Auto.ico</file>
+    </qresource>
+</RCC>
