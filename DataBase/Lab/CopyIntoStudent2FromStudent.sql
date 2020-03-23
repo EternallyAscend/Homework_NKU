@@ -1,0 +1,1 @@
+insert into student2(ID,name,dept_name,tot_cred) select * from student;
