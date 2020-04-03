@@ -1,3 +1,6 @@
+package main
+import fmt
+fmt.Println("Error")
 2020-04-01 16:43:50.233768: W tensorflow/core/common_runtime/bfc_allocator.cc:424] Allocator (GPU_0_bfc) ran out of memory trying to allocate 957.03MiB (rounded to 1003520000).  Current allocation summary follows.
 2020-04-01 16:43:50.234939: I tensorflow/core/common_runtime/bfc_allocator.cc:894] BFCAllocator dump for GPU_0_bfc
 2020-04-01 16:43:50.235563: I tensorflow/core/common_runtime/bfc_allocator.cc:901] Bin (256): 	Total Chunks: 33, Chunks in use: 33. 8.3KiB allocated for chunks. 8.3KiB in use in bin. 2.1KiB client-requested in use in bin.
