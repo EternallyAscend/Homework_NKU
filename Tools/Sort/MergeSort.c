@@ -34,7 +34,7 @@ void mergeSort(int start, int end, int *data) {
 		}
 		if (rightCounter < end) {
 			while (rightCounter < end) {
-				temp[counter] = data[rightCounter++];
+				temp[counter++] = data[rightCounter++];
 			}
 		}
 		int i = start;
