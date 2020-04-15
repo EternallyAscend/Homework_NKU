@@ -36,3 +36,16 @@ call selectPrerequisite(292);
 
 select * from prerequisiteResult;
 select * from prerequisiteTemp;
+
+
+
+delimiter //
+create procedure clearPrerequisiteTemp()
+begin
+drop table if exists prerequisiteResult;
+drop table if exists prerequisiteAdd;
+end //
+delimiter ;
+
+call clearPrerequisiteTemp();
+
