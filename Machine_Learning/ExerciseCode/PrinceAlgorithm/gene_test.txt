@@ -1,0 +1,49 @@
+alpha = 0.1;
+iters = 50;
+--------------------test1--------------------
+Please input phenotype_id:
+100800
+Related genes(top10):
+    [129]    'FGFR3'
+
+    [2108]    'COMP'
+
+    [6804]    'IDUA'
+
+    [6120]    'MPP3'
+
+    [2959]    'C6orf47'
+
+    [2121]    'COL9A1'
+
+    [2960]    'GPSM3'
+
+    [5433]    'FGF23'
+
+    [2820]    'FGF5'
+
+    [2956]    'FGF6'
+
+--------------------test2--------------------
+Please input phenotype_id:
+103500
+Related genes(top10):
+    [4204]    'MITF'
+
+    [4493]    'TFEB'
+
+    [4494]    'TFEC'
+
+    [4495]    'ZNF278'
+
+    [6147]    'OTX2'
+
+    [4087]    'TFE3'
+
+    [1785]    'LEF1'
+
+    [3428]    'PAX6'
+
+    [1759]    'SPI1'
+
+    [179]    'PIAS3'
