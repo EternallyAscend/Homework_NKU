@@ -52,17 +52,59 @@ $$P(X=x)=\frac{C_{100}^{x}\cdot(x-1)!\cdot(100-x)!}{100!}=\frac{\frac{100!}{(x-1
 
 由$P(B)=P(X=51)+P(X=52)+\cdots+P(X=100)$可以得到：
 
-$P(B)=\frac{1}{51}+\frac{1}{52}+\cdots+\frac{1}{100}=\underset{n=51}{\overset{100}{\Sigma}}\frac{1}{n}$
+$P(B)=\frac{1}{51}+\frac{1}{52}+\cdots+\frac{1}{100}=\underset{n=51}{\overset{100}{\Sigma}}\frac{1}{n}\approx0.68817217931019520326$
 
 由$P(A)=1-P(B)$可以得到：
 
-$P(A)=1-P(B)=1-\underset{n=51}{\overset{100}{\Sigma}}\frac{1}{n}=$
+$P(A)=1-P(B)=1-\underset{n=51}{\overset{100}{\Sigma}}\frac{1}{n}\approx0.31182782068980479674$
+
+因此采用上述的策略可以有约31%的概率能够使得所有囚犯获得特赦。
+
+
+
+## 模拟结果
+
+采用Java程序模拟完全随机100次和上述策略100次，结果如下。
 
 
 
 ## 推广分析
 
-以上的分析思路可以应用于抽屉的总数为$2n$，允许开启$n$个抽屉，或者抽屉的总数为$2n+1$，允许开启$n+1$个抽屉的情况。
+### 推广至n趋于无穷的情况
+
+以上的分析思路可以应用于抽屉的总数为$2n$，允许开启$n$个抽屉，或者抽屉的总数为$2n+1$，允许开启$n+1$个抽屉的情况。$(n\gt0)$
+
+首先对于总数为$2n$的情况，可以推导假设$x（n\lt x \leqslant2n）$为最大环长度时：
+
+设事件A为最大环长度不超过$n$，设事件B为最大环长度超过$n$，X表示最大环长度。
+
+对于最大环而言，随机选取$x$个点，他们组成一个环的所有可能为$C_{2n}^{x}\cdot(x-1)!$种。
+
+对于剩余的$(2n-x)$个点而言，他们组成环的所有可能共有$(2n-x)!$种。
+
+$$P(X=x)=\frac{C_{2n}^{x}\cdot(x-1)!\cdot(2n-x)!}{(2n)!}=\frac{\frac{(2n)!}{(x-1)!\cdot(2n-x)!}\cdot x!\cdot(2n-x)!}{(2n)!}=\frac{1}{x}$$
+
+由$P(B)=P(X=n+1)+P(X=n+2)+\cdots+P(X=2n)$可以得到：
+
+$P(B)=\frac{1}{n+1}+\frac{1}{n+2}+\cdots+\frac{1}{2n}=\underset{\alpha=n+1}{\overset{2n}{\Sigma}}\frac{1}{\alpha}$
+
+根据调和级数公式：$\underset{\alpha=1}{\overset{n}{\Sigma}}\frac{1}{\alpha}=ln(n)+\gamma$，其中$\gamma$为欧拉常数。
+
+$\gamma=\underset{n\rightarrow \infty}{\lim}\int_{1}^{n}(\frac{1}{\lfloor x \rfloor}-\frac{1}{x})dx\approx0.577215664$
+
+我们可以利用$\underset{\alpha=1}{\overset{2n}{\Sigma}}\frac{1}{\alpha}-\underset{\alpha=1}{\overset{n}{\Sigma}}\frac{1}{\alpha}$得到$\underset{\alpha=n+1}{\overset{2n}{\Sigma}}\frac{1}{\alpha}$
+
+$P(B)=\underset{\alpha=n+1}{\overset{2n}{\Sigma}}\frac{1}{\alpha}=ln(2n)+\gamma-(ln(n)+\gamma)=ln(2n)-ln(n)=ln(2)$
+
+由$P(A)=1-P(B)$可以得到：
+
+$P(A)=1-P(B)=1-\underset{\alpha=n+1}{\overset{2n}{\Sigma}}\frac{1}{\alpha}=1-ln(2)\approx0.306853$
+
+因此采用上述的策略当n趋于无穷时可以有约30%的概率能够使得所有囚犯获得特赦。
+
+
+
+### 探究分组对概率的影响
 
 100个囚犯进行一次活动和100个囚犯分为两组分别活动的对比。
 
@@ -71,6 +113,43 @@ $P(A)=1-P(B)=1-\underset{n=51}{\overset{100}{\Sigma}}\frac{1}{n}=$
 
 
 ## 代码验证
+
+概率计算
+
+```Java
+import java.util.*;
+import java.lang.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+public class Main {
+	public static void main(String []args) {
+		BigDecimal bigDecimal = new BigDecimal(0);
+		BigDecimal one = new BigDecimal(1);
+		try {
+			for(int i=51; i<101; i++) {
+				bigDecimal = bigDecimal.add(one.divide(new BigDecimal(i),20,RoundingMode.HALF_DOWN));
+			}
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			System.out.println("Error Occured.");
+		}
+		finally {
+			System.out.println(bigDecimal);
+			System.out.println(one.subtract(bigDecimal));
+		}
+	}
+}
+
+//Output:
+//0.68817217931019520326
+//0.31182782068980479674
+
+```
+
+
+
+模拟实验 100次完全随机
 
 ```Java
 import java.util.*;
