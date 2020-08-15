@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,13 +34,8 @@ public class Simulation{
 					if(zeroFile.exists()) {
 						FileReader fileReader = new FileReader(zeroFile);
 						BufferedReader bufferedReader = new BufferedReader(fileReader);
-						String line;
 						int row=0;
-						while((line = bufferedReader.readLine()) != null){
-//							String[] temp = line.split("\t");
-//							for(int j=0;j<temp.length;j++){
-//								arr2[row][j] = Double.parseDouble(temp[j]);
-//							}
+						while((bufferedReader.readLine()) != null){
 							row++;
 						}
 						bufferedReader.close();
@@ -80,9 +74,24 @@ public class Simulation{
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
-		simulation.start();
-
+		try {
+			simulation.start();
+			try {
+				simulation.writeFile();
+				System.out.println("The result has saved at 'Result\\report.txt'.");
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+				System.out.println("Can not save the result.");
+				simulation.printResult();
+			}
+		} catch (IOException ie) {
+			ie.printStackTrace();
+			File dataSetDirectory = new File("dataSet");
+			if(dataSetDirectory.exists()) {
+				deleteFileOfDirectory(dataSetDirectory);
+			}
+			System.out.println("Crashed files have been deleted. Please run it again.");
+		}
 	}
 	
 	public static void deleteFileOfDirectory(File fileDirectory) {
@@ -156,8 +165,10 @@ public class Simulation{
 	}
 	
 	private class SimulationLab extends Thread {
-		volatile ArrayList drawer;
-		volatile ArrayList number;
+
+		int type;
+		ArrayList drawer;
+		ArrayList number;
 		
 		public SimulationLab() {
 			// TODO Auto-generated constructor stub
@@ -167,7 +178,22 @@ public class Simulation{
 		
 		@Override
 		public void run() {
-			
+			int result;
+			result = 0;
+			addResult(result);
+			switch(this.type) {
+				case 1:
+					this.random();
+					break;
+				case 2:
+					this.method();
+					break;
+				case 3:
+					this.group();
+					break;
+				default:
+					break;
+			}
 		}
 
 		public void readNumber(int index, int rows) throws IOException {
@@ -178,10 +204,7 @@ public class Simulation{
 				String line;
 				int row=0;
 				while((line = bufferedReader.readLine()) != null){
-							String[] temp = line.split("\t");
-							for(int j=0; j<temp.length; j++){
-
-							}
+					this.number.add(Integer.parseInt(line));
 					row++;
 				}
 				if(row != rows) {
@@ -193,20 +216,37 @@ public class Simulation{
 				throw new IOException("File not found.");
 			}
 		}
+
+		public void setType(int type) {
+			this.type = type;
+		}
+
+		public void random() {
+
+		}
+
+		public void method() {
+
+		}
+
+		public void group() {
+
+		}
 	}
 	
 	private int size;
 	private int dataSize;
 	private int type;
 	private ArrayList labsArrayList;
-//	private ArrayList initDataArrayList;
+	volatile private ArrayList dataArrayList;
+	File result;
 	
 	private void init(int size, int dataSize, int type) {
 		this.size = size;
 		this.dataSize = dataSize;
 		this.type = type;
-//		this.initDataArrayList = new ArrayList();
 		this.labsArrayList = new ArrayList();
+		this.dataArrayList = new ArrayList();
 		for(int cursor = 0; cursor < size; cursor++) {
 			DataCreater dataCreater = new DataCreater();
 			dataCreater.setSize(size);
@@ -251,10 +291,13 @@ public class Simulation{
 
 	}
 
-	private void start() {
+	private void start() throws IOException{
 
 		for(int cursor = 0; cursor < this.size; cursor++) {
-			this.labsArrayList.add(new SimulationLab());
+			SimulationLab simulationLab = new SimulationLab();
+			simulationLab.setType(this.getType());
+			simulationLab.readNumber(cursor, this.dataSize);
+			this.labsArrayList.add(simulationLab);
 		}
 
 		switch(this.type) {
@@ -269,6 +312,26 @@ public class Simulation{
 				break;
 			default:
 				System.out.println("Wrong Method.");
+				break;
 		}
+	}
+
+	private void addResult(int result) {
+		this.dataArrayList.add(result);
+	}
+
+	private void writeFile() throws IOException {
+		this.result = new File("Result");
+		if(!this.result.exists()) {
+			this.result.mkdir();
+		}
+		this.result = new File("Result\\report.txt");
+		if(!this.result.exists()) {
+			this.result.createNewFile();
+		}
+	}
+
+	private void printResult() {
+
 	}
 }
