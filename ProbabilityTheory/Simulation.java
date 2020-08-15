@@ -9,7 +9,7 @@ import java.lang.*;
 public class Simulation{
 	public static void main(String []args) {
 		Simulation simulation = new Simulation();
-		simulation.init(100, 100, 100);
+//		simulation.init(100, 100, 100);
 		try {
 			boolean created = false;
 			File dataSetDirectory = new File("dataSet");
@@ -42,6 +42,8 @@ public class Simulation{
 //							}
 							row++;
 						}
+						bufferedReader.close();
+						fileReader.close();
 						System.out.println(String.format("The dataSet have %d files, %d rows per file.", counter, row));
 						simulation.setDataSize(row);
 						created = true;
@@ -54,6 +56,9 @@ public class Simulation{
 					} else {
 						System.out.println("The dataSet is wrong, it will create a new one.");
 					}
+				} else {
+					deleteFileOfDirectory(dataSetDirectory);
+					dataSetDirectory.mkdir();
 				}
 			} else {
 				// Here not exists 'dataSet' directory.
@@ -62,15 +67,34 @@ public class Simulation{
 			if(!created) {
 				// Create directory and create new dataSet.
 				
-				System.out.println("Please input dataSetSize dataSize and Type like '100 100 1', '1: Random', '2: Method', '3: Group'.");
+				System.out.println("Please input dataSetSize dataSize and Type like '100 100 1', 100 < number < 1000, '1: Random', '2: Method', '3: Group'.");
 				Scanner inputScanner = new Scanner(System.in);
 				String argsInput = inputScanner.nextLine();
-//				simulation.init(size, type);
+				String[] argsList = argsInput.split(" ");
+				simulation.init(Integer.parseInt(argsList[0]), Integer.parseInt(argsList[1]), Integer.parseInt(argsList[2]));
 			}
 			Thread.sleep(1000);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public static void deleteFileOfDirectory(File fileDirectory) {
+		if (fileDirectory == null || !fileDirectory.exists()){
+            System.out.println("Wrong FileDirectory.");
+            return;
+        }
+        File[] files = fileDirectory.listFiles();
+        for (File f: files){
+            String name = f.getName();
+            System.out.println(String.format("Delete %s", name));
+            if (f.isDirectory()){
+                deleteFileOfDirectory(f);
+            } else {
+                f.delete();
+            }
+        }
+        fileDirectory.delete();
 	}
 	
 	private class DataCreater implements Runnable {
@@ -126,12 +150,12 @@ public class Simulation{
 	}
 	
 	private class SimulationLab extends Thread {
-		volatile ArrayList drawer;
+//		volatile ArrayList drawer;
 		volatile ArrayList number;
 		
 		public SimulationLab() {
 			// TODO Auto-generated constructor stub
-			this.drawer = new ArrayList();
+//			this.drawer = new ArrayList();
 			this.number = new ArrayList();
 		}
 		
