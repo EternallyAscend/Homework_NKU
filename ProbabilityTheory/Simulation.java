@@ -1,9 +1,7 @@
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.*;
 
 public class Simulation{
@@ -167,20 +165,18 @@ public class Simulation{
 	private class SimulationLab extends Thread {
 
 		int type;
-		ArrayList drawer;
+		HashSet drawer;
 		ArrayList number;
 		
 		public SimulationLab() {
 			// TODO Auto-generated constructor stub
-			this.drawer = new ArrayList();
+			this.drawer = new HashSet();
 			this.number = new ArrayList();
 		}
 		
 		@Override
 		public void run() {
-			int result;
-			result = 0;
-			addResult(result);
+//			System.out.println(this.type);
 			switch(this.type) {
 				case 1:
 					this.random();
@@ -222,22 +218,80 @@ public class Simulation{
 		}
 
 		public void random() {
-
+			Random random = new Random();
+			System.out.println(this.number.toString());
+			for(int person = 0; person < this.number.size(); person++) {
+				boolean notFound = true;
+				for(int hash = 0; hash < this.number.size(); hash++) {
+					this.drawer.add(hash);
+				}
+				for(int open = 0; open < this.number.size() / 2; open++) {
+					double rate = random.nextDouble();
+					while(rate == 1.0) {
+						rate = random.nextDouble();
+					}
+					int position = (int)(this.number.size() * rate);
+					while(!this.drawer.contains(position)) {
+						rate = random.nextDouble();
+						while(rate == 1.0) {
+							rate = random.nextDouble();
+						}
+						position = (int)(this.number.size() * rate);
+					}
+					this.drawer.remove(position);
+					if(position == person) {
+						notFound = false;
+						break;
+					}
+				}
+				this.drawer.clear();
+				if(notFound) {
+					addResult(person + 1);
+					return;
+				}
+			}
+			addResult(0);
 		}
 
 		public void method() {
-
+			int remaining = this.number.size();
+			int center = (int)(remaining / 2);
+			for(int cursor = 0; cursor < this.number.size(); cursor++) {
+				this.drawer.add(cursor);
+			}
+			int start = 0;
+			while(remaining > center) {
+				int length = 1;
+				while(!this.drawer.contains(start)) {
+					start++;
+				}
+				this.drawer.remove(start);
+				remaining--;
+				int cursor = (int)this.number.get(start);
+				while(cursor != start) {
+					this.drawer.remove(cursor);
+					cursor = (int)this.number.get(cursor);
+					length++;
+					remaining--;
+					if(length > center) {
+						addResult(0);
+						return;
+					}
+				}
+			}
+			addResult(1);
 		}
 
 		public void group() {
-
+			int group0 = (int)(this.number.size() / 2);
+			int group1 = this.number.size() - group0;
 		}
 	}
 	
 	private int size;
 	private int dataSize;
 	private int type;
-	private ArrayList labsArrayList;
+	private ArrayList<SimulationLab> labsArrayList;
 	volatile private ArrayList dataArrayList;
 	File result;
 	
@@ -245,7 +299,7 @@ public class Simulation{
 		this.size = size;
 		this.dataSize = dataSize;
 		this.type = type;
-		this.labsArrayList = new ArrayList();
+		this.labsArrayList = new ArrayList<SimulationLab>();
 		this.dataArrayList = new ArrayList();
 		for(int cursor = 0; cursor < size; cursor++) {
 			DataCreater dataCreater = new DataCreater();
@@ -280,15 +334,36 @@ public class Simulation{
 	}
 
 	private void randomLab() {
-
+		for(SimulationLab simulationLab:this.labsArrayList) {
+			simulationLab.start();
+			try {
+				simulationLab.join();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void methodLab() {
-
+		for(SimulationLab simulationLab:this.labsArrayList) {
+			simulationLab.start();
+			try {
+				simulationLab.join();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void groupLab() {
-
+		for(SimulationLab simulationLab:this.labsArrayList) {
+			simulationLab.start();
+			try {
+				simulationLab.join();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void start() throws IOException{
@@ -329,9 +404,39 @@ public class Simulation{
 		if(!this.result.exists()) {
 			this.result.createNewFile();
 		}
+		BigDecimal bigDecimal = new BigDecimal(0);
+		for(int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
+//			System.out.println(new BigDecimal((int)this.dataArrayList.get(cursor)));
+			bigDecimal = bigDecimal.add(new BigDecimal((int)this.dataArrayList.get(cursor)));
+		}
+		System.out.println(bigDecimal.toString());
+//		System.out.println(this.dataArrayList.size());
+		bigDecimal = bigDecimal.multiply(new BigDecimal(100));
+		bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
+		String rate = String.valueOf(bigDecimal);
+		FileWriter fileWriter = new FileWriter(this.result, true);
+//		PrintWriter printWriter = new PrintWriter(fileWriter);
+//		printWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s.\n", this.type, this.size, this.dataSize, rate));
+//		printWriter.append(this.dataArrayList.toString());
+//		printWriter.append("\n");
+//		printWriter.flush();
+//		printWriter.close();
+		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+		bufferedWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s %s.\n", this.type, this.size, this.dataSize, rate, "%"));
+		bufferedWriter.append(this.dataArrayList.toString());
+		bufferedWriter.append("\n");
+		bufferedWriter.close();
+		fileWriter.close();
 	}
 
 	private void printResult() {
-
+		BigDecimal bigDecimal = new BigDecimal(0);
+		for(int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
+			bigDecimal = bigDecimal.add(new BigDecimal((int)this.dataArrayList.get(cursor)));
+		}
+		bigDecimal = bigDecimal.multiply(new BigDecimal(100));
+		bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
+		String rate = String.valueOf(bigDecimal);
+		System.out.println(String.format("The rate is %s percent.", rate));
 	}
 }
