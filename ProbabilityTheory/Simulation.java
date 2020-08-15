@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +11,7 @@ public class Simulation{
 	public static void main(String []args) {
 		Simulation simulation = new Simulation();
 //		simulation.init(100, 100, 100);
+		// DataSet.
 		try {
 			boolean created = false;
 			File dataSetDirectory = new File("dataSet");
@@ -55,18 +57,19 @@ public class Simulation{
 						simulation.setType(type);
 					} else {
 						System.out.println("The dataSet is wrong, it will create a new one.");
+						deleteFileOfDirectory(dataSetDirectory);
 					}
 				} else {
 					deleteFileOfDirectory(dataSetDirectory);
-					dataSetDirectory.mkdir();
+//					dataSetDirectory.mkdir();
 				}
 			} else {
 				// Here not exists 'dataSet' directory.
-				dataSetDirectory.mkdir();
+//				dataSetDirectory.mkdir();
 			}
 			if(!created) {
 				// Create directory and create new dataSet.
-				
+				dataSetDirectory.mkdir();
 				System.out.println("Please input dataSetSize dataSize and Type like '100 100 1', 100 < number < 1000, '1: Random', '2: Method', '3: Group'.");
 				Scanner inputScanner = new Scanner(System.in);
 				String argsInput = inputScanner.nextLine();
@@ -77,6 +80,9 @@ public class Simulation{
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+
+		simulation.start();
+
 	}
 	
 	public static void deleteFileOfDirectory(File fileDirectory) {
@@ -150,12 +156,12 @@ public class Simulation{
 	}
 	
 	private class SimulationLab extends Thread {
-//		volatile ArrayList drawer;
+		volatile ArrayList drawer;
 		volatile ArrayList number;
 		
 		public SimulationLab() {
 			// TODO Auto-generated constructor stub
-//			this.drawer = new ArrayList();
+			this.drawer = new ArrayList();
 			this.number = new ArrayList();
 		}
 		
@@ -163,12 +169,36 @@ public class Simulation{
 		public void run() {
 			
 		}
+
+		public void readNumber(int index, int rows) throws IOException {
+			File number = new File(String.format("dataSet\\%d.txt", index));
+			if(number.exists()) {
+				FileReader fileReader = new FileReader(number);
+				BufferedReader bufferedReader = new BufferedReader(fileReader);
+				String line;
+				int row=0;
+				while((line = bufferedReader.readLine()) != null){
+							String[] temp = line.split("\t");
+							for(int j=0; j<temp.length; j++){
+
+							}
+					row++;
+				}
+				if(row != rows) {
+					throw new IOException("File crashed.");
+				}
+				bufferedReader.close();
+				fileReader.close();
+			} else {
+				throw new IOException("File not found.");
+			}
+		}
 	}
 	
 	private int size;
 	private int dataSize;
 	private int type;
-//	private ArrayList labsArrayList;
+	private ArrayList labsArrayList;
 //	private ArrayList initDataArrayList;
 	
 	private void init(int size, int dataSize, int type) {
@@ -176,7 +206,7 @@ public class Simulation{
 		this.dataSize = dataSize;
 		this.type = type;
 //		this.initDataArrayList = new ArrayList();
-//		this.labsArrayList = new ArrayList();
+		this.labsArrayList = new ArrayList();
 		for(int cursor = 0; cursor < size; cursor++) {
 			DataCreater dataCreater = new DataCreater();
 			dataCreater.setSize(size);
@@ -195,5 +225,50 @@ public class Simulation{
 	
 	private void setType(int type) {
 		this.type = type;
+	}
+
+	private int getSize() {
+		return this.size;
+	}
+
+	private int getDataSize() {
+		return this.dataSize;
+	}
+
+	private int getType() {
+		return this.type;
+	}
+
+	private void randomLab() {
+
+	}
+
+	private void methodLab() {
+
+	}
+
+	private void groupLab() {
+
+	}
+
+	private void start() {
+
+		for(int cursor = 0; cursor < this.size; cursor++) {
+			this.labsArrayList.add(new SimulationLab());
+		}
+
+		switch(this.type) {
+			case 1:
+				this.randomLab();
+				break;
+			case 2:
+				this.methodLab();
+				break;
+			case 3:
+				this.groupLab();
+				break;
+			default:
+				System.out.println("Wrong Method.");
+		}
 	}
 }
