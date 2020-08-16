@@ -47,6 +47,7 @@ public class Simulation{
 						choosingNewOrExistScanner.close();
 						int type = Integer.parseInt(typeString);
 						simulation.setType(type);
+						simulation.read();
 					} else {
 						System.out.println("The dataSet is wrong, it will create a new one.");
 						deleteFileOfDirectory(dataSetDirectory);
@@ -66,7 +67,8 @@ public class Simulation{
 				Scanner inputScanner = new Scanner(System.in);
 				String argsInput = inputScanner.nextLine();
 				String[] argsList = argsInput.split(" ");
-				simulation.init(Integer.parseInt(argsList[0]), Integer.parseInt(argsList[1]), Integer.parseInt(argsList[2]));
+				simulation.init(Integer.parseInt(argsList[0]),
+						Integer.parseInt(argsList[1]), Integer.parseInt(argsList[2]));
 			}
 			Thread.sleep(1000);
 		} catch (Exception ex) {
@@ -285,6 +287,7 @@ public class Simulation{
 		public void group() {
 			int group0 = (int)(this.number.size() / 2);
 			int group1 = this.number.size() - group0;
+			this.method();
 		}
 	}
 	
@@ -307,6 +310,11 @@ public class Simulation{
 			dataCreater.setName(cursor);
 			dataCreater.run();
 		}
+	}
+
+	private void read() {
+		this.labsArrayList = new ArrayList<SimulationLab>();
+		this.dataArrayList = new ArrayList();
 	}
 	
 	private void setSize(int size) {
@@ -405,34 +413,111 @@ public class Simulation{
 			this.result.createNewFile();
 		}
 		BigDecimal bigDecimal = new BigDecimal(0);
-		for(int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
-//			System.out.println(new BigDecimal((int)this.dataArrayList.get(cursor)));
-			bigDecimal = bigDecimal.add(new BigDecimal((int)this.dataArrayList.get(cursor)));
-		}
-		System.out.println(bigDecimal.toString());
+		if(this.type == 1) {
+			for (int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
+				if((int)this.dataArrayList.get(cursor) == 0) {
+					bigDecimal = bigDecimal.add(new BigDecimal(1));
+				}
+			}
+			System.out.println(bigDecimal.toString());
 //		System.out.println(this.dataArrayList.size());
-		bigDecimal = bigDecimal.multiply(new BigDecimal(100));
-		bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
-		String rate = String.valueOf(bigDecimal);
-		FileWriter fileWriter = new FileWriter(this.result, true);
+			bigDecimal = bigDecimal.multiply(new BigDecimal(100));
+			bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
+			String rate = String.valueOf(bigDecimal);
+			FileWriter fileWriter = new FileWriter(this.result, true);
 //		PrintWriter printWriter = new PrintWriter(fileWriter);
 //		printWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s.\n", this.type, this.size, this.dataSize, rate));
 //		printWriter.append(this.dataArrayList.toString());
 //		printWriter.append("\n");
 //		printWriter.flush();
 //		printWriter.close();
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-		bufferedWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s %s.\n", this.type, this.size, this.dataSize, rate, "%"));
-		bufferedWriter.append(this.dataArrayList.toString());
-		bufferedWriter.append("\n");
-		bufferedWriter.close();
-		fileWriter.close();
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			bufferedWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s %s.\n",
+					this.type, this.size, this.dataSize, rate, "%"));
+			bufferedWriter.append(this.dataArrayList.toString());
+			bufferedWriter.append("\n");
+			bufferedWriter.close();
+			fileWriter.close();
+		} else if(this.type == 2) {
+			for (int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
+//			System.out.println(new BigDecimal((int)this.dataArrayList.get(cursor)));
+				bigDecimal = bigDecimal.add(new BigDecimal((int) this.dataArrayList.get(cursor)));
+			}
+			System.out.println(bigDecimal.toString());
+//		System.out.println(this.dataArrayList.size());
+			bigDecimal = bigDecimal.multiply(new BigDecimal(100));
+			bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
+			String rate = String.valueOf(bigDecimal);
+			FileWriter fileWriter = new FileWriter(this.result, true);
+//		PrintWriter printWriter = new PrintWriter(fileWriter);
+//		printWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s.\n", this.type, this.size, this.dataSize, rate));
+//		printWriter.append(this.dataArrayList.toString());
+//		printWriter.append("\n");
+//		printWriter.flush();
+//		printWriter.close();
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			bufferedWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s %s.\n",
+					this.type, this.size, this.dataSize, rate, "%"));
+			bufferedWriter.append(this.dataArrayList.toString());
+			bufferedWriter.append("\n");
+			bufferedWriter.close();
+			fileWriter.close();
+		} else if(this.type == 3) {
+			int center = this.dataArrayList.size();
+			center = center >> 1;
+			int left = 0;
+			int right = 0;
+			for(int cursor = 0; cursor < center; cursor++) {
+//			System.out.println(new BigDecimal());
+				left += (int)this.dataArrayList.get(cursor);
+			}
+			for(int cursor = center; cursor < this.dataArrayList.size(); cursor++) {
+				right += (int)this.dataArrayList.get(cursor);
+			}
+			bigDecimal = new BigDecimal(left).divide(new BigDecimal(center), 2, RoundingMode.HALF_DOWN);
+			String g0 = bigDecimal.toString();
+			bigDecimal = new BigDecimal(right).divide(new BigDecimal(this.dataArrayList.size() - center),
+					2, RoundingMode.HALF_DOWN);
+			String g1 = bigDecimal.toString();
+			g0 = String.valueOf(Double.parseDouble(g0) * Double.parseDouble(g1) * 100);
+			g1 = String.valueOf((100.0 - (Double.parseDouble(g0) / Double.parseDouble(g1))) *
+					(1.0 - Double.parseDouble(g1)) + Double.parseDouble(g0));
+//			System.out.println(bigDecimal.toString());
+//		System.out.println(this.dataArrayList.size());
+			bigDecimal = new BigDecimal(left + right);
+			bigDecimal = bigDecimal.multiply(new BigDecimal(100));
+			bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
+			String rate = String.valueOf(bigDecimal);
+			FileWriter fileWriter = new FileWriter(this.result, true);
+//		PrintWriter printWriter = new PrintWriter(fileWriter);
+//		printWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s.\n", this.type, this.size, this.dataSize, rate));
+//		printWriter.append(this.dataArrayList.toString());
+//		printWriter.append("\n");
+//		printWriter.flush();
+//		printWriter.close();
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			bufferedWriter.append(String.format("Type: %d, Times: %d, DataSize: %d, Rate: %s %s, %s%s %s%s.\n",
+					this.type, this.size, this.dataSize, rate, "%", g0, "%", g1, "%"));
+			bufferedWriter.append(this.dataArrayList.toString());
+			bufferedWriter.append("\n");
+			bufferedWriter.close();
+			fileWriter.close();
+		}
 	}
 
 	private void printResult() {
 		BigDecimal bigDecimal = new BigDecimal(0);
-		for(int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
-			bigDecimal = bigDecimal.add(new BigDecimal((int)this.dataArrayList.get(cursor)));
+		if(this.type == 1) {
+			for (int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
+				if((int)this.dataArrayList.get(cursor) == 0) {
+					bigDecimal = bigDecimal.add(new BigDecimal(1));
+				}
+			}
+		}
+		else {
+			for (int cursor = 0; cursor < this.dataArrayList.size(); cursor++) {
+				bigDecimal = bigDecimal.add(new BigDecimal((int) this.dataArrayList.get(cursor)));
+			}
 		}
 		bigDecimal = bigDecimal.multiply(new BigDecimal(100));
 		bigDecimal = bigDecimal.divide(new BigDecimal(this.dataArrayList.size()), 2, RoundingMode.HALF_DOWN);
