@@ -306,7 +306,7 @@ public class Simulation{
 		this.dataArrayList = new ArrayList();
 		for(int cursor = 0; cursor < size; cursor++) {
 			DataCreater dataCreater = new DataCreater();
-			dataCreater.setSize(size);
+			dataCreater.setSize(dataSize);
 			dataCreater.setName(cursor);
 			dataCreater.run();
 		}
